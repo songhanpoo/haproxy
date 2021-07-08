@@ -1,0 +1,17 @@
+---
+- name: Update Centos
+  yum:
+    update_only: yes
+  environment: "{{proxy_env}}"
+
+- name: Ensure haproxy is installed.
+  yum:
+    name: "{{haproxy_package_name}}"
+    state: present
+  environment: "{{proxy_env}}"
+
+- name: enable service httpd and ensure it is not masked
+  systemd:
+    name: "{{ haproxy_package_name }}"
+    enabled: yes
+    masked: no

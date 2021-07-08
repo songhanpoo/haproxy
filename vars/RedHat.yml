@@ -1,0 +1,4 @@
+
+haproxy_package_name: haproxy
+haproxy_path_config: /etc/haproxy/haproxy.cfg
+haproxy_acl_path: /etc/haproxy/acl

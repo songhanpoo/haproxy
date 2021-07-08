@@ -1,0 +1,19 @@
+---
+- name: Ensure haproxy_acl_path exists.
+  file:
+    path: "{{ haproxy_acl_path }}"
+    state: directory
+
+
+- name: Add managed ACL
+  template:
+    src: acl-template.j2
+    dest: "{{haproxy_acl_path}}/{{item.1.file}}"
+    force: true
+    owner: root
+    group: root
+    mode: 0644
+  with_subelements:
+    - "{{ frontend }}"
+    - acl
+  when: item.1.file is defined

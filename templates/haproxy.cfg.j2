@@ -1,0 +1,271 @@
+#jinja2: trim_blocks:False
+global
+{% if global_scope.chroot is defined %}
+    chroot                    {{global_scope.chroot}}
+{% endif %}
+{% if global_scope.pidfile is defined %}
+    pidfile                   {{global_scope.pidfile}}
+{% endif %}
+{% if global_scope.maxconn is defined %}
+    maxconn                   {{global_scope.maxconn}}
+{% endif %}
+{% if global_scope.log is defined %}
+    log                       {{global_scope.log}}
+{% endif %}
+{% if global_scope.user is defined %}
+    user                      {{global_scope.user}}
+{% endif %}
+{% if global_scope.group is defined %}
+    group                     {{global_scope.group}}
+{% endif %}
+{% if global_scope.stats is defined %}
+    stats                     {{global_scope.stats}}
+{% endif %}
+{% if global_scope.nbproc is defined %}
+    nbproc                    {{global_scope.nbproc}}
+{% endif %}
+{% if global_scope.nbthread is defined %}
+    nbthread                  {{global_scope.nbthread}}
+{% endif %}
+{% if global_scope.daemon is sameas true %}
+    daemon
+{% endif %}
+
+{% if global_scope.cpu_map is defined %}
+{% if global_scope.cpu_map is iterable %}
+{% if global_scope.cpu_map is sequence and global_scope.cpu_map is not mapping and global_scope.cpu_map is not string %}
+{% for e in global_scope.cpu_map%}
+    cpu-map                     {{e}}
+{%endfor%}
+{% else %}
+    cpu-map                     {{ global_scope.cpu_map }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if global_scope.ssl_default_bind_ciphers is defined %}
+    ssl-default-bind-ciphers  {{global_scope.ssl_default_bind_ciphers}}
+{% endif %}
+{% if global_scope.ssl_default_bind_options is defined %}
+    ssl-default-bind-options  {{global_scope.ssl_default_bind_options}}
+{% endif %}
+
+defaults
+
+{% if defaults_scope.option is defined %}
+{% if defaults_scope.option is iterable %}
+{% if defaults_scope.option is sequence and defaults_scope.option is not mapping and defaults_scope.option is not string %}
+{% for e in defaults_scope.option%}
+    option                     {{e}}
+{%endfor%}
+{% else %}
+    option                     {{ defaults_scope.option }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if defaults_scope.timeout_http_request is defined %}
+    timeout http-request       {{defaults_scope.timeout_http_request}}
+{% endif %}
+{% if defaults_scope.timeout_queue is defined %}
+    timeout queue              {{defaults_scope.timeout_queue}}
+{% endif %}
+{% if defaults_scope.timeout_connect is defined %}
+    timeout connect            {{defaults_scope.timeout_connect}}
+{% endif %}
+{% if defaults_scope.timeout_server is defined %}
+    timeout server             {{defaults_scope.timeout_server}}
+{% endif %}
+{% if defaults_scope.timeout_client is defined %}
+    timeout client             {{defaults_scope.timeout_client}}
+{% endif %}
+{% if defaults_scope.timeout_http_keep_alive is defined %}
+    timeout http-keep-alive    {{defaults_scope.timeout_http_keep_alive}}
+{% endif %}
+{% if defaults_scope.timeout_check is defined %}
+    timeout check              {{defaults_scope.timeout_check}}
+{% endif %}
+{% if defaults_scope.timeout_tunnel is defined %}
+    timeout tunnel             {{defaults_scope.timeout_tunnel}}
+{% endif %}
+{% if defaults_scope.log is defined %}
+    log                        {{defaults_scope.log}}
+{% endif %}
+{% if defaults_scope.mode is defined %}
+    mode                       {{defaults_scope.mode}}
+{% endif %}
+{% if defaults_scope.maxconn is defined %}
+    maxconn                    {{defaults_scope.maxconn}}
+{% endif %}
+{% if defaults_scope.retries is defined %}
+    retries                    {{defaults_scope.retries}}
+{% endif %}
+
+
+{% if frontend is defined and frontend|length%}
+{% for item in frontend %}
+frontend {{ item.name}}
+{% if item.bind is defined %}
+{% if item.bind is iterable %}
+{% if item.bind is sequence and item.bind is not mapping and item.bind is not string %}
+{% for e in item.bind%}
+    bind                     {{e}}
+{%endfor%}
+{% else %}
+    bind                     {{ item.bind }}
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if item.mode is defined and item.mode|length %}
+    mode                        {{ item.mode}}
+{% endif%}
+{% if item.option is defined %}
+{% if item.option is iterable %}
+{% if item.option is sequence and item.option is not mapping and item.option is not string %}
+{% for e in item.option%}
+    option                     {{e}}
+{%endfor%}
+{% else %}
+    option                     {{ item.option }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if item.timeout_connect is defined and item.timeout_connect|length %}
+    timeout connect             {{ item.timeout_connect}}
+{% endif%}
+{% if item.timeout_server is defined and item.timeout_server|length %}
+    timeout server              {{ item.timeout_server}}
+{% endif%}
+{% if item.timeout_client is defined and item.timeout_client|length %}
+    timeout client              {{ item.timeout_client}}
+{% endif%}
+{% if item.default_backend is defined and item.default_backend|length %}
+    default_backend             {{ item.default_backend}}
+{% endif%}
+
+{% if item.acl  is defined and item.acl|length %}
+{% for e in item.acl %}
+{% if e.host is defined and e.host|length %}
+    acl {{ e.name }} hdr(host) -i {{ e.host }}
+{% endif %}
+
+{% if e.file is defined and e.file|length %}
+    acl {{ e.name }} src -f {{haproxy_acl_path}}/{{ e.file }}
+{% endif %}
+
+{% if e.url is defined and e.url|length %}
+    acl {{ e.name }} url {{ e.url }}
+{% endif %}
+
+{% if e.prefix is defined and e.prefix|length %}
+    acl {{ e.name }} url_beg {{ e.prefix }}
+{% endif %}
+
+{% if e.subdir is defined and e.subdir|length %}
+    acl {{ e.name }} url_dir {{ e.subdir }}
+{% endif %}
+
+{% if e.domain is defined and e.domain|length %}
+    acl {{ e.name }} url_dom {{ e.domain }}
+{% endif %}
+
+{% if e.suffix is defined and e.suffix|length %}
+    acl {{ e.name }} url_end {{ e.suffix }}
+{% endif %}
+
+{% if e.length is defined and e.length|length %}
+    acl {{ e.name }} url_len {{ e.length }}
+{% endif %}
+
+{% if e.regex is defined and e.regex|length %}
+    acl {{ e.name }} url_reg {{ e.regex }}
+{% endif %}
+
+{% if e.substring is defined and e.substring|length %}
+    acl {{ e.name }} url_sub {{ e.substring }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if item.conditions is defined and item.conditions|length %}
+{% for e in item.conditions %}
+    use_backend {{ e.use_backend }} if {% for i in e.when_match %} {{i}} {% endfor %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if backend is defined and backend|length%}
+{% for item in backend %}
+backend {{ item.name}}
+    mode {{ item.mode}}
+    balance {{item.balance}}
+{% if item.default_server is defined%}
+    default-server {{item.default_server}}
+{% endif %}
+
+{% if item.mode is defined and item.mode|length %}
+    mode                        {{ item.mode}}
+{% endif%}
+{% if item.option is defined %}
+{% if item.option is iterable %}
+{% if item.option is sequence and item.option is not mapping and item.option is not string %}
+{% for e in item.option%}
+    option                     {{e}}
+{%endfor%}
+{% else %}
+    option                     {{ item.option }}
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if item.timeout_server is defined and item.timeout_server|length %}
+    timeout server              {{ item.timeout_server}}
+{% endif%}
+{% if item.default_backend is defined and item.default_backend|length %}
+    default_backend             {{ item.default_backend}}
+{% endif%}
+{% if item.server is defined and item.server|length %}
+{% for i in item.server %}
+{% if i.name is defined and i.name|length %}
+    server {{ i.name }} {{ i.address }} {{ i.action}} {% if i.maxconn is defined%} maxconn {{i.maxconn}}{%endif%} {% if i.custom is defined%}{{i.custom}}{%endif%}
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if listen is defined and listen|length%}
+{% for item in listen %}
+listen {{ item.name}}
+{% if item.mode is defined %}
+    mode {{ item.mode}}
+{% endif %}
+{% if item.bind is defined %}
+{% if item.bind is iterable %}
+{% if item.bind is sequence and item.bind is not mapping and item.bind is not string %}
+{% for e in item.bind%}
+    bind                     {{e}}
+{%endfor%}
+{% else %}
+    bind                     {{ item.bind }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if item.stats is defined %}
+{% if item.stats is iterable %}
+{% if item.stats is sequence and item.stats is not mapping and item.stats is not string %}
+{% for e in item.stats %}
+    stats                     {{e}}
+{%endfor%}
+{% else %}
+    stats                     {{ item.stats }}
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
